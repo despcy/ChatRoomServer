@@ -50,7 +50,12 @@ void *receiveData(void* arg){
         if(strcmp(buffer, "quit\n") == 0)
             break;
         printf("Client %d recv data size %d is %s\n", client,iDataNum, buffer);
-        send(client, buffer, iDataNum, 0);
+        if(client==4){
+           send(5, buffer, iDataNum, 0);
+        }else{
+          send(4, buffer, iDataNum, 0);
+        }
+        
     }
     return NULL;
 };
