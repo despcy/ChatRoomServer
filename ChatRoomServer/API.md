@@ -77,6 +77,11 @@
 
 ## Del friend:
 
+`DELF`
+
+|Code|Meaning|
+|----|-------|
+|YRFR|Delete Friend Successfully,you are free|
 
 ## Send Message To Friend Added:
 
