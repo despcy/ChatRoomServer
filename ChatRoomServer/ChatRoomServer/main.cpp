@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#define SERVER_PORT 5555
+#define SERVER_PORT 5556
 
 /*
  监听后，一直处于accept阻塞状态，
@@ -50,10 +50,10 @@ void *receiveData(void* arg){
         if(strcmp(buffer, "quit\n") == 0)
             break;
         printf("Client %d recv data size %d is %s\n", client,iDataNum, buffer);
-        if(client==4){
-           send(5, buffer, iDataNum, 0);
+        if(client%2==0){
+           send(client+1, buffer, iDataNum, 0);
         }else{
-          send(4, buffer, iDataNum, 0);
+          send(client-1, buffer, iDataNum, 0);
         }
         
     }
