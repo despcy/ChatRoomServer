@@ -80,7 +80,7 @@
 
 ## Send Message To Friend Added:
 
-`MSSG=yourmessagehere `
+`MSSG?TEXT=yourmessagehere&USER=username `
 
 |Code|Meaning|
 |----|-------|
