@@ -31,9 +31,9 @@
 
 `LOGN?NAME=yourusername&PASS=yourpassword`
 
-**Username must be at most 20 Characters, only [1-9][a-z][A-Z] allowed**
+**Username must be at most 20 Characters, only [0-9][a-z][A-Z] allowed**
 
-**Password must be at most 20 Characters, only [1-9][a-z][A-Z] allowed**
+**Password must be at most 20 Characters, only [0-9][a-z][A-Z] allowed**
 
 ### Return:
 
