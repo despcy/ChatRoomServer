@@ -1,6 +1,6 @@
 # ChatRoomServer
 Chat room server side for EECS22L project
-
+### **[Click Here For API Document](./ChatRoomServer/API.md)**
 Usage:
 
 1. `git clone https://github.com/yangchenxi/ChatRoomServer.git`
