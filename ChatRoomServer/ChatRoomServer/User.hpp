@@ -20,7 +20,7 @@ public:
     User* getPartner();
     int getSocket();
     bool setisFree(bool isfree);
-    bool setCharPartner(User* partner);
+    bool setChatPartner(User* partner);
     bool setSocket(int sock);
 private:
     string username;

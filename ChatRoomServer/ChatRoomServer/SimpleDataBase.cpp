@@ -135,6 +135,35 @@ bool Database::isUserNameExists(string userName){
     return false;
 }
 
+bool Database::checkUser(string userName, string password){
+    ifstream readFile(UserNameAndPassTable);
+    if(!readFile) {
+        cout << "Database Cannot open input file.\n";
+        return false;
+    }
+    
+    string substr1;
+    string substr2;
+    while(readFile) {
+        
+        getline(readFile,substr1,',');  // delim defaults to '\n'
+        getline(readFile,substr2,'\n');
+        if(readFile){
+            if (substr1==userName&&substr2==password) {
+                readFile.close();
+                return true;
+            }
+            
+        }
+        
+        
+    }
+    
+    readFile.close();
+    
+    return false;
+}
+
 vector<string> Database::getAllFriends(string userName){
     vector<string> friends;
     ifstream readFile(UserFriendTable);
