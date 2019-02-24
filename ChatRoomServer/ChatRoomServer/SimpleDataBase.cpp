@@ -54,7 +54,7 @@ bool Database::addFriend(string userName, string friendName){
 }
 
 bool Database::isFriend(string userName, string friendName){
-    ifstream readFile(UserFriendTable);
+    ifstream readFile(UserFriendTable.c_str());
     if(!readFile) {
         cout << "Database Cannot open input file.\n";
         return false;
@@ -81,7 +81,7 @@ bool Database::isFriend(string userName, string friendName){
 
 bool Database::delFriend(string userName,string friendName){
     if(isFriend(userName, friendName)){
-        fstream ioFile(UserFriendTable);
+        fstream ioFile(UserFriendTable.c_str());
         if(!ioFile) {
             cout << "Database Cannot open input file.\n";
             return false;
@@ -110,7 +110,7 @@ bool Database::delFriend(string userName,string friendName){
 }
 
 bool Database::isUserNameExists(string userName){
-    ifstream readFile(UserNameAndPassTable);
+    ifstream readFile(UserNameAndPassTable.c_str());
     if(!readFile) {
         cout << "Database Cannot open input file.\n";
         return false;
@@ -136,7 +136,7 @@ bool Database::isUserNameExists(string userName){
 }
 
 bool Database::checkUser(string userName, string password){
-    ifstream readFile(UserNameAndPassTable);
+    ifstream readFile(UserNameAndPassTable.c_str());
     if(!readFile) {
         cout << "Database Cannot open input file.\n";
         return false;
@@ -166,7 +166,7 @@ bool Database::checkUser(string userName, string password){
 
 vector<string> Database::getAllFriends(string userName){
     vector<string> friends;
-    ifstream readFile(UserFriendTable);
+    ifstream readFile(UserFriendTable.c_str());
     if(!readFile) {
         cout << "Database Cannot open input file.\n";
         return friends;
