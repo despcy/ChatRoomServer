@@ -18,6 +18,4 @@ g++ main.o SimpleDataBase.o User.o -lpthread -o server
 4. `./server`
 
 
-DBReference: https://blog.csdn.net/sesiria/article/details/51584516
-
 Reference: https://blog.csdn.net/lovekun1989/article/details/41042273
