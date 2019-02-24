@@ -15,8 +15,8 @@ Database::Database(){
     UserFriendTable="UserFriendTable.txt";
     UserNameAndPassTable="UserNameAndPassTable.txt";
     try{
-    UserFriendFile.open(UserFriendTable,std::ios_base::app);
-    UserNameAndPassFile.open(UserNameAndPassTable,std::ios_base::app);
+    UserFriendFile.open(UserFriendTable.c_str(),std::ios_base::app);
+    UserNameAndPassFile.open(UserNameAndPassTable.c_str(),std::ios_base::app);
     }catch(int e){
         cout<<"An exception occurred In open database file Exception Nr. " << e << endl;
     }
