@@ -81,7 +81,7 @@ RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
 |Code|Meaning|
 |----|-------|
-|YRFR|Delete Friend Successfully|
+|DESU|Delete Friend Successfully|
 |NUSR|no such user|
 
 ## Send Message To Friend Added:
@@ -90,7 +90,7 @@ RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
 |Code|Meaning|
 |----|-------|
-|MACK|Server received the message|
+|NFRI|this user is not your friend|
 |NOLN|friend offline|
 # Server To Client:
 
