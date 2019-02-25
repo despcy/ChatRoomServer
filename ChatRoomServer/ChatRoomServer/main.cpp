@@ -27,7 +27,7 @@
 #include <time.h>
 #include "SimpleDataBase.hpp"
 #include "User.hpp"
-#define SERVER_PORT 5556
+int SERVER_PORT=12345;
 int MAX_USERNAME_AND_PASS_LENGTH=20;
 //
 ///*
