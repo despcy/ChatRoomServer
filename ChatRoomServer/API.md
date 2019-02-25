@@ -57,11 +57,8 @@
 
 `LSUS`
 
-RESPONSE: [Online Friend User List Update](## Online Friend User List Update:)
+RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
-### Return format:
-
-`USER[Username1,Username2,Username3,...]`
 
 
 ## Add friend:
@@ -76,6 +73,7 @@ RESPONSE: [Online Friend User List Update](## Online Friend User List Update:)
 |AGRE|friend add successfully|
 |NUSR|no such user|
 |NOLN|friend not online|
+|ISFR|you two are already friends|
 
 ## Del friend:
 
@@ -110,7 +108,7 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 
 ## Online Friend User List Update:
 
-`LIST[Username1,Username2,Username3,...]`
+`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`
 
 ## New Friend Request:
 
@@ -118,13 +116,10 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 
 |Code|Meaning|
 |----|-------|
-|ACFR|ACCEPT|
-|REFR|REJECT|
+|ACFR?FROM=Username|ACCEPT friend request asked from username|
+|REFR?FROM=Username|REJECT the request asked form username|
 
 ## New Message:
 
 `RMSG?FROM=yourFriendUserName&MTXT=yournewmessagehere`
 
-|Code|Meaning|
-|----|-------|
-|ACKM|message received|
