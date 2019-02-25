@@ -61,7 +61,7 @@ RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
 ### Return format:
 
-`USER[Username1,Username2,Username3,...]`
+`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`
 
 
 ## Add friend:
