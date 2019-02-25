@@ -7,13 +7,29 @@
 //
 
 #include "User.hpp"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <pthread.h>
 using namespace std;
 
-User::User(string name){
+User::User(string name,pthread_t self,int sock){
     username=name;
     isFree=true;
-    socket=-1;
+    socket=sock;
     nowChatingWith=NULL;
+    threadId=self;
+}
+
+User::~User(){
+    //close socket,clean thread
+    shutdown(getSocket(), SHUT_RDWR);
+    pthread_cancel(getThread());
+    cout<<"User:"<<getUsername()<<"R.I.P"<<endl;
+}
+
+pthread_t User::getThread(){
+    return threadId;
 }
 
 string User::getUsername(){
@@ -41,9 +57,9 @@ bool User::setisFree(bool isfree){
 bool User::setChatPartner(User* partner){
       setisFree(true);
     if(getPartner()!=NULL){//now is chating
-        User *partner=getPartner();
-        partner->setChatPartner(NULL);
-        partner->setisFree(true);
+        User *oldpartner=getPartner();
+        oldpartner->setChatPartner(NULL);
+        oldpartner->setisFree(true);
     }
     
     if(partner!=NULL&&!partner->isFree){//the partner is now busy

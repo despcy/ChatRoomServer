@@ -26,7 +26,7 @@
 #include "SimpleDataBase.hpp"
 #include "User.hpp"
 #define SERVER_PORT 5556
-
+int MAX_USERNAME_AND_PASS_LENGTH=20;
 //
 ///*
 // 监听后，一直处于accept阻塞状态，
@@ -36,8 +36,10 @@
 //
 Database database;
 vector<User> onlineUsers;
-bool DBLock=false;//database lock for thread
-bool onlineUsersLock=false;//thread lock
+pthread_mutex_t DBLock = PTHREAD_MUTEX_INITIALIZER;//database lock for thread
+pthread_mutex_t userList = PTHREAD_MUTEX_INITIALIZER;//thread lock
+bool killUserIfOnline(string username);
+bool afterLoginMsgHandler(User user);
 using namespace std;
 
 string receiveStringData(int client){
@@ -66,18 +68,17 @@ string receiveStringData(int client){
 
 bool registerUser(string username,string pass){
     bool success=false;
-    while (1) {
-        if(DBLock==false){
-            DBLock=true;
-            success=database.createUser(username, pass);
-            DBLock=false;
-            break;
-        }
-    }
+    pthread_mutex_lock(&DBLock);
+    success=database.createUser(username, pass);
+    pthread_mutex_unlock(&DBLock);
+
     return success;
 }
 
 bool checkUserNamePassFormat(string txt){//[0-9][a-z][A-Z]
+    if (txt.length()>MAX_USERNAME_AND_PASS_LENGTH){
+        return false;
+    }
     for(int i=0;i<txt.size();i++){
         if(!isalpha(txt[i])&&!isdigit(txt[i])){
             return false;
@@ -115,6 +116,7 @@ void *receiveData(void* arg){
         string code=data.substr(0,4);
         if(code=="BBYE"){
             send(client, "BBYE", 4, 0);
+            shutdown(client, SHUT_RDWR);
             return 0;
         }
         if(code!="REGI"&&code!="LOGN"){
@@ -137,7 +139,15 @@ void *receiveData(void* arg){
         if(code=="LOGN"){//login
             if(login(username, password)){
                  send(client,"OKLN", 4, 0);
-                
+                //check online user list, if user already online, substitute new user 挤下线
+                killUserIfOnline(username);
+                User *user=new User(username,pthread_self(),client);
+                pthread_mutex_lock(&userList);
+                onlineUsers.push_back(*user);
+                pthread_mutex_unlock(&userList);
+                afterLoginMsgHandler(*user);
+                shutdown(client, SHUT_RDWR);
+                return 0;
             }else{
                 send(client,"WPAS", 4, 0);
             }
@@ -150,8 +160,44 @@ void *receiveData(void* arg){
         }
 
     }
+  //  shutdown(client, SHUT_RDWR);
     return NULL;
 };
+
+bool killUserIfOnline(string username){
+    pthread_mutex_lock(&userList);
+    for (int i=0; i<onlineUsers.size(); i++) {
+        if (onlineUsers[i].getUsername()==username) {
+            onlineUsers.erase(onlineUsers.begin()+i);
+        }
+    }
+
+    pthread_mutex_unlock(&userList);
+    return true;
+}
+
+bool afterLoginMsgHandler(User user){
+    while (1) {
+     
+        string data=receiveStringData(user.getSocket());
+        if (data.size()<4) {
+            send(user.getSocket(),"ERRO", 4, 0);
+            continue;
+        }
+        
+        string code=data.substr(0,4);
+        if(code=="BBYE"){
+            send(user.getSocket(), "BBYE", 4, 0);
+            if (user.getPartner()!=NULL) {
+                user.getPartner()->setisFree(true);
+            }
+            return 0;
+        }
+        
+        
+    }
+    return false;
+}
 
 int main()
 {
@@ -224,6 +270,8 @@ int main()
         printf("Thread ID %ld for Client %d IP %s:%d\n",(long)thread_id,client,inet_ntoa(clientAddr.sin_addr),htons(clientAddr.sin_port));
 
     }
+    
+
     return 0;
 }
 

@@ -14,11 +14,13 @@
 using namespace std;
 class User{
 public:
- User(string name);
+    User(string name,pthread_t self,int sock);
+    ~User();
     string getUsername();
     bool getisFree();
     User* getPartner();
     int getSocket();
+    pthread_t getThread();
     bool setisFree(bool isfree);
     bool setChatPartner(User* partner);
     bool setSocket(int sock);
@@ -27,7 +29,7 @@ private:
     bool isFree;
     User *nowChatingWith;
     int socket;
-    
+    pthread_t threadId;
 };
 
 #endif /* User_hpp */
