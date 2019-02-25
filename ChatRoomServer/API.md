@@ -115,8 +115,8 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 
 |Code|Meaning|
 |----|-------|
-|ACFR|ACCEPT|
-|REFR|REJECT|
+|ACFR?FROM=Username|ACCEPT friend request asked from username|
+|REFR?FROM=Username|REJECT the request asked form username|
 
 ## New Message:
 
