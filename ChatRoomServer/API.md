@@ -57,7 +57,9 @@
 
 `LSUS`
 
-RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
+RESPONSE: ~~[Online Friend User List Update](#online-friend-user-list-update)~~
+
+`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`
 
 
 
@@ -106,9 +108,9 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 |----|-------|
 |OKLV|tell server you are online|
 
-## Online Friend User List Update:
+~~## Online Friend User List Update:~~
 
-`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`
+~~`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`~~
 
 ## New Friend Request:
 
