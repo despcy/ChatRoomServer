@@ -53,9 +53,11 @@
 |----|-------|
 |BBYE|Success|
 
-## Get Online User List:
+## Get Online Friend List:
 
 `LSUS`
+
+RESPONSE: [Online Friend User List Update](## Online Friend User List Update:)
 
 ### Return format:
 
@@ -71,16 +73,18 @@
 |Code|Meaning|
 |----|-------|
 |FRFU|friend refused request|
-|TOUT|request time out, friend no response for 60 second|
-|CONN|friend add successfully|
+|AGRE|friend add successfully|
+|NUSR|no such user|
+|NOLN|friend not online|
 
 ## Del friend:
 
-`DELF`
+`DELF?NAME=yourfriendname`
 
 |Code|Meaning|
 |----|-------|
-|YRFR|Delete Friend Successfully,you are free|
+|YRFR|Delete Friend Successfully|
+|NUSR|no such user|
 
 ## Send Message To Friend Added:
 
@@ -89,8 +93,7 @@
 |Code|Meaning|
 |----|-------|
 |MACK|Server received the message|
-|NCON|friend offline|
-|FBZY|friend is chating with others|
+|NOLN|friend offline|
 # Server To Client:
 
 ## HeartBeat
@@ -105,9 +108,9 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 |----|-------|
 |OKLV|tell server you are online|
 
-## Online User List Update:
+## Online Friend User List Update:
 
-`NEWU[Username1,Username2,Username3,...]`
+`LIST[Username1,Username2,Username3,...]`
 
 ## New Friend Request:
 
@@ -125,7 +128,3 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 |Code|Meaning|
 |----|-------|
 |ACKM|message received|
-
-## Your friend close the connection:
-
-`CLOS?FROM=yourFriendUserName`
