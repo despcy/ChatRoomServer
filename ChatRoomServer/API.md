@@ -90,7 +90,7 @@
 |Code|Meaning|
 |----|-------|
 |MACK|Server received the message|
-|NCON|you must add a friend before sending|
+|NCON|friend offline|
 
 # Server To Client:
 
@@ -121,12 +121,12 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 
 ## New Message:
 
-RMSG?MSID=12345&MTXT=yournewmessagehere
+`RMSG?FROM=yourFriendUserName&MTXT=yournewmessagehere`
 
 |Code|Meaning|
 |----|-------|
-|ACKM?MSID=12345|message id 12345 received|
+|ACKM|message received|
 
-## You are deleted by friend:
+## Your friend close the connection:
 
-`YDEL`
+`CLOS?FROM=yourFriendUserName`
