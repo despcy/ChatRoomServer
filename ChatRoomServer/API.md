@@ -57,7 +57,9 @@
 
 `LSUS`
 
-RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
+RESPONSE: ~~[Online Friend User List Update](#online-friend-user-list-update)~~
+
+`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`
 
 
 
@@ -69,8 +71,8 @@ RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
 |Code|Meaning|
 |----|-------|
-|FRFU|friend refused request|
-|AGRE|friend add successfully|
+|FRRE?FROM=friendUsername|friend refused request(this code may not be received immediately)|
+|FRAC?FROM=friendUsername|friend add successfully(this code may not be received immediately)|
 |NUSR|no such user|
 |NOLN|friend not online|
 |ISFR|you two are already friends|
@@ -81,7 +83,7 @@ RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
 |Code|Meaning|
 |----|-------|
-|YRFR|Delete Friend Successfully|
+|DESU|Delete Friend Successfully|
 |NUSR|no such user|
 
 ## Send Message To Friend Added:
@@ -90,7 +92,7 @@ RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
 |Code|Meaning|
 |----|-------|
-|MACK|Server received the message|
+|NFRI|this user is not your friend|
 |NOLN|friend offline|
 # Server To Client:
 
@@ -106,9 +108,9 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 |----|-------|
 |OKLV|tell server you are online|
 
-## Online Friend User List Update:
+~~## Online Friend User List Update:~~
 
-`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`
+~~`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`~~
 
 ## New Friend Request:
 
