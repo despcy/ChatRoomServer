@@ -23,6 +23,8 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <ctype.h>
+#include <map>
+#include <time.h>
 #include "SimpleDataBase.hpp"
 #include "User.hpp"
 #define SERVER_PORT 5556
@@ -35,15 +37,34 @@ int MAX_USERNAME_AND_PASS_LENGTH=20;
 // */
 //
 Database database;
-vector<User> onlineUsers;
+vector<User*> onlineUsers;
+map<string,string> friendRequestMap;//hash map for resolveing thread communication friend invatation check
+pthread_mutex_t hashLock = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t DBLock = PTHREAD_MUTEX_INITIALIZER;//database lock for thread
 pthread_mutex_t userList = PTHREAD_MUTEX_INITIALIZER;//thread lock
 bool killUserIfOnline(string username);
-bool afterLoginMsgHandler(User user);
+bool afterLoginMsgHandler(User* user);
 User* isUserOnline(string username);
+string getFriendListMsg(vector<string> friends);
 using namespace std;
 
+
+// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+const std::string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+    
+    return buf;
+}
+
 string receiveStringData(int client){
+    string data;
+    try{
     char buffer[200];
     int iDataNum;
     iDataNum =(int) recv(client, buffer, 1024, 0);
@@ -62,11 +83,39 @@ string receiveStringData(int client){
         }
     }
     buffer[iDataNum] = '\0';
+    data=buffer;
+    }catch(int e){
+        data="ReadERROR";
+    }
+    //-------------------logPrint----
+    cout<<currentDateTime()<<"   Socket: "<<client<<"   Thread: "<<(long)pthread_self()<<"  Data: "<<data<<endl;
+    cout<<"OnlineUser: "<<endl;
+    pthread_mutex_lock(&userList);
+    for (int i=0; i<onlineUsers.size(); i++) {
+        cout<<"name: "<<onlineUsers[i]->getUsername()<<"  Socket: "<<onlineUsers[i]->getSocket()<<"  Thread: "<<(long)onlineUsers[i]->getThread()<<endl;
+    }
     
-    string data=buffer;
+    pthread_mutex_unlock(&userList);
+    //-----------------------------
     return data;
 }
-
+string getFriendListMsg(vector<string> friends){
+    if (friends.size()==0) {
+        return "USER[]";
+    }
+    string msg="USER[";
+    for (int i=0;i<friends.size() ; i++) {
+        msg+="NAME="+friends[i]+"&STAT=";
+        if(isUserOnline(friends[i])==NULL){
+            msg+="OFLN,";
+        }else{
+            msg+="ONLN,";
+        }
+        
+    }
+    msg[msg.size()-1]=']';
+    return msg;
+}
 bool registerUser(string username,string pass){
     bool success=false;
     pthread_mutex_lock(&DBLock);
@@ -90,9 +139,9 @@ bool checkUserNamePassFormat(string txt){//[0-9][a-z][A-Z]
 User* isUserOnline(string username){
     pthread_mutex_lock(&userList);
     for (int i=0; i<onlineUsers.size(); i++) {
-        if (onlineUsers[i].getUsername()==username) {
+        if (onlineUsers[i]->getUsername()==username) {
               pthread_mutex_unlock(&userList);
-            return &onlineUsers[i];
+            return onlineUsers[i];
         }
     }
     
@@ -134,6 +183,7 @@ void *receiveData(void* arg){
         string code=data.substr(0,4);
         if(code=="BBYE"){
             send(client, "BBYE", 4, 0);
+            
             shutdown(client, SHUT_RDWR);
             return 0;
         }
@@ -161,9 +211,9 @@ void *receiveData(void* arg){
                 killUserIfOnline(username);
                 User *user=new User(username,pthread_self(),client);
                 pthread_mutex_lock(&userList);
-                onlineUsers.push_back(*user);
+                onlineUsers.push_back(user);
                 pthread_mutex_unlock(&userList);
-                afterLoginMsgHandler(*user);
+                afterLoginMsgHandler(user);
                 shutdown(client, SHUT_RDWR);
                 return 0;
             }else{
@@ -185,7 +235,8 @@ void *receiveData(void* arg){
 bool killUserIfOnline(string username){
     pthread_mutex_lock(&userList);
     for (int i=0; i<onlineUsers.size(); i++) {
-        if (onlineUsers[i].getUsername()==username) {
+        if (onlineUsers[i]->getUsername()==username) {
+            delete onlineUsers[i];
             onlineUsers.erase(onlineUsers.begin()+i);
         }
     }
@@ -194,68 +245,147 @@ bool killUserIfOnline(string username){
     return true;
 }
 
-bool afterLoginMsgHandler(User user){
-    vector<string> newFriendWaitResponseQueue;
+bool afterLoginMsgHandler(User* user){
+    
     while (1) {
-    //client To server===========
-        string data=receiveStringData(user.getSocket());
+        //client To server===========
+        string data=receiveStringData(user->getSocket());
         if (data.size()<4) {
-            send(user.getSocket(),"ERRO", 4, 0);
+            send(user->getSocket(),"ERRO", 4, 0);
             continue;
         }
         
         string code=data.substr(0,4);
         if(code=="BBYE"){
-            send(user.getSocket(), "BBYE", 4, 0);
-            killUserIfOnline(user.getUsername());
+            send(user->getSocket(), "BBYE", 4, 0);
+            killUserIfOnline(user->getUsername());
             return 0;
         }
         
         if(code=="LSUS"){
-             pthread_mutex_lock(&DBLock);
-            user.broadcastUserListUpdateToAllFriends(database.getAllFriends(user.getUsername()));
-             pthread_mutex_lock(&DBLock);
+            pthread_mutex_lock(&DBLock);
+            vector<string> friendList=database.getAllFriends(user->getUsername());
+            pthread_mutex_unlock(&DBLock);
+            string message=getFriendListMsg(friendList);
+            send(user->getSocket(),message.c_str(),message.size(), 0);
             continue;
         }
         
         if(code=="ADDF"){
             try {
-                 string friendUserName=data.substr(10,data.size()-10);
+                string friendUserName=data.substr(10,data.size()-10);
                 pthread_mutex_lock(&DBLock);
-                if(database.isFriend(user.getUsername(), friendUserName)){
-                    send(user.getSocket(), "ISFR", 4, 0);
+                if(database.isFriend(user->getUsername(), friendUserName)){
+                    send(user->getSocket(), "ISFR", 4, 0);
                     pthread_mutex_unlock(&DBLock);
                     continue;
                 }
                 if(!database.isUserNameExists(friendUserName)){
-                    send(user.getSocket(), "NUSR", 4, 0);
+                    send(user->getSocket(), "NUSR", 4, 0);
                     pthread_mutex_unlock(&DBLock);
                     continue;
                 }
                 pthread_mutex_unlock(&DBLock);
                 User *myFriend=isUserOnline(friendUserName);
                 if(myFriend==NULL){
-                    send(user.getSocket(), "NOLN", 4, 0);
+                    send(user->getSocket(), "NOLN", 4, 0);
                     continue;
                 }
                 
                 
-                string friendRequest="FRIE?"+user.getUsername();
+                string friendRequest="FRIE?"+user->getUsername();
                 send(myFriend->getSocket(),friendRequest.c_str(),friendRequest.length(), 0);
-                newFriendWaitResponseQueue.push_back(myFriend->getUsername());
+                pthread_mutex_lock(&hashLock);
+                friendRequestMap[user->getUsername()]=friendUserName;
+                pthread_mutex_unlock(&hashLock);
                 
-                 
+                
             } catch (int e) {
-                cout<<"user"<<user.getUsername()<<"add friend Fail"<<endl;
-                send(user.getSocket(), "ERRO", 4, 0);
+                cout<<"user"<<user->getUsername()<<"add friend Fail"<<endl;
+                send(user->getSocket(), "ERRO", 4, 0);
             }
-           
+            
+            continue;
+        }
+        
+        if(code=="DELF"){
+            string friendUserName=data.substr(10,data.size()-10);
+            pthread_mutex_lock(&DBLock);
+            if(!database.isFriend(user->getUsername(), friendUserName)){
+                send(user->getSocket(), "NUSR", 4, 0);
+                pthread_mutex_unlock(&DBLock);
+                continue;
+            }
+            database.delFriend(user->getUsername(),friendUserName);
+            pthread_mutex_unlock(&DBLock);
+            send(user->getSocket(), "DESU", 4, 0);
+            continue;
+        }
+        if(code=="MSSG"){
+            string messageContent;
+            string deliverTo;
+            extractParameter(data, &messageContent, &deliverTo);
+            pthread_mutex_lock(&DBLock);
+            if(!database.isFriend(user->getUsername(), deliverTo)){
+                send(user->getSocket(), "NFRI", 4, 0);
+                pthread_mutex_unlock(&DBLock);
+                continue;
+            }
+            pthread_mutex_unlock(&DBLock);
+            User *userToSend=isUserOnline(deliverTo);
+            if (userToSend==NULL) {
+                send(user->getSocket(), "NOLN", 4, 0);
+                continue;
+            }
+            string message="RMSG?FROM="+user->getUsername()+"&MTXT="+messageContent;
+            send(userToSend->getSocket(), message.c_str(), message.size(), 0);
             continue;
         }
         
         
-      //------------------Client To Server---------------------------------
+        //------------------Response after Server To Client---------------------------------
+        if (code=="OKLV") {
+            //heartbeatresponse to be continued
+            continue;
+        }
         
+        if(code=="ACFR"||code=="REFR"){//accept or deny the friend invatation
+            string friendUserName=data.substr(10,data.size()-10);
+            pthread_mutex_lock(&DBLock);
+            if(!database.isUserNameExists(friendUserName)){
+                send(user->getSocket(), "NUSR", 4, 0);
+                pthread_mutex_unlock(&DBLock);
+                continue;
+            }
+            pthread_mutex_unlock(&DBLock);
+            pthread_mutex_lock(&hashLock);
+            if(friendRequestMap[friendUserName]!=user->getUsername()){
+                
+                pthread_mutex_unlock(&hashLock);
+                continue;
+            }
+            friendRequestMap[friendUserName]="";
+            pthread_mutex_unlock(&hashLock);
+            User *userWhoSendMeTheRequest=isUserOnline(friendUserName);
+            if(code=="ACFR"){
+                pthread_mutex_lock(&DBLock);
+                database.addFriend(friendUserName, user->getUsername());
+                pthread_mutex_unlock(&DBLock);
+            }
+            if(userWhoSendMeTheRequest!=NULL){//send accept message
+                if(code=="REFR"){
+                    string message="FRRE?FROM="+user->getUsername();
+                    send(userWhoSendMeTheRequest->getSocket(), message.c_str(), message.size(), 0);
+                }else{
+                    string message="FRAC?FROM="+user->getUsername();
+                    send(userWhoSendMeTheRequest->getSocket(), message.c_str(), message.size(), 0);
+                }
+            }
+            
+            continue;
+        }
+        
+        send(user->getSocket(),"ERRO", 4, 0);//not valied code
         
     }
     return false;
@@ -328,7 +458,8 @@ int main()
         printf("Port is %d\n", htons(clientAddr.sin_port));
 
         pthread_t thread_id;
-        pthread_create(&thread_id, NULL, receiveData, (void*)&client);
+        int clientNum=client;
+        pthread_create(&thread_id, NULL, receiveData, (void*)&clientNum);
         printf("Thread ID %ld for Client %d IP %s:%d\n",(long)thread_id,client,inet_ntoa(clientAddr.sin_addr),htons(clientAddr.sin_port));
 
     }

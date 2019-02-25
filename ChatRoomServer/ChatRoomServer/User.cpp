@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <vector>
 using namespace std;
 
 User::User(string name,pthread_t self,int sock){

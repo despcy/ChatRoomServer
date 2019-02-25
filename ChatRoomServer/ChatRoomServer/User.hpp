@@ -21,7 +21,6 @@ public:
     int getSocket();
     pthread_t getThread();
     bool setSocket(int sock);
-    void broadcastUserListUpdateToAllFriends(vector<string> friends);
 private:
     string username;
     int socket;
