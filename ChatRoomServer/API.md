@@ -122,6 +122,3 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 
 `RMSG?FROM=yourFriendUserName&MTXT=yournewmessagehere`
 
-|Code|Meaning|
-|----|-------|
-|ACKM|message received|
