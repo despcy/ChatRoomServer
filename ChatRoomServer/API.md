@@ -70,8 +70,7 @@
 
 |Code|Meaning|
 |----|-------|
-|FBZY|friend is chating with others|
-|FRFU|friend refused connection|
+|FRFU|friend refused request|
 |TOUT|request time out, friend no response for 60 second|
 |CONN|friend add successfully|
 
@@ -91,7 +90,7 @@
 |----|-------|
 |MACK|Server received the message|
 |NCON|friend offline|
-
+|FBZY|friend is chating with others|
 # Server To Client:
 
 ## HeartBeat
