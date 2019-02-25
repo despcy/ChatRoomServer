@@ -59,9 +59,6 @@
 
 RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
-### Return format:
-
-`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`
 
 
 ## Add friend:
@@ -110,7 +107,7 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 
 ## Online Friend User List Update:
 
-`LIST[Username1,Username2,Username3,...]`
+`USER[NAME=Username1&STAT=ONLN,NAME=UserName2&STAT=OFLN,......]`
 
 ## New Friend Request:
 
