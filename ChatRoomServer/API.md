@@ -85,7 +85,7 @@
 
 ## Send Message To Friend Added:
 
-`MSSG?TEXT=yourmessagehere&USER=username `
+`MSSG?TEXT=yourmessagehere&GOTO=username `
 
 |Code|Meaning|
 |----|-------|
