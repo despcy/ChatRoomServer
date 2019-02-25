@@ -73,6 +73,7 @@ RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 |AGRE|friend add successfully|
 |NUSR|no such user|
 |NOLN|friend not online|
+|ISFR|you two are already friends|
 
 ## Del friend:
 
