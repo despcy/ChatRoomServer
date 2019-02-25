@@ -69,8 +69,8 @@ RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
 |Code|Meaning|
 |----|-------|
-|FRFU|friend refused request|
-|AGRE|friend add successfully|
+|FRRE?FROM=friendUsername|friend refused request|
+|FRAC?FROM=friendUsername|friend add successfully|
 |NUSR|no such user|
 |NOLN|friend not online|
 |ISFR|you two are already friends|
