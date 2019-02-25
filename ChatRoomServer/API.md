@@ -57,7 +57,7 @@
 
 `LSUS`
 
-RESPONSE: [Online Friend User List Update](## Online Friend User List Update:)
+RESPONSE: [Online Friend User List Update](#online-friend-user-list-update)
 
 ### Return format:
 
