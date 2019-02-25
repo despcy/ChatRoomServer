@@ -70,8 +70,7 @@
 
 |Code|Meaning|
 |----|-------|
-|FBZY|friend is chating with others|
-|FRFU|friend refused connection|
+|FRFU|friend refused request|
 |TOUT|request time out, friend no response for 60 second|
 |CONN|friend add successfully|
 
@@ -85,13 +84,13 @@
 
 ## Send Message To Friend Added:
 
-`MSSG?TEXT=yourmessagehere&USER=username `
+`MSSG?TEXT=yourmessagehere&GOTO=username `
 
 |Code|Meaning|
 |----|-------|
 |MACK|Server received the message|
-|NCON|you must add a friend before sending|
-
+|NCON|friend offline|
+|FBZY|friend is chating with others|
 # Server To Client:
 
 ## HeartBeat
@@ -121,12 +120,12 @@ To keep alive, **Server will send client** the following Code every 30 seconds, 
 
 ## New Message:
 
-RMSG?MSID=12345&MTXT=yournewmessagehere
+`RMSG?FROM=yourFriendUserName&MTXT=yournewmessagehere`
 
 |Code|Meaning|
 |----|-------|
-|ACKM?MSID=12345|message id 12345 received|
+|ACKM|message received|
 
-## You are deleted by friend:
+## Your friend close the connection:
 
-`YDEL`
+`CLOS?FROM=yourFriendUserName`
