@@ -18,16 +18,12 @@ public:
     ~User();
     string getUsername();
     bool getisFree();
-    User* getPartner();
     int getSocket();
     pthread_t getThread();
-    bool setisFree(bool isfree);
-    bool setChatPartner(User* partner);
     bool setSocket(int sock);
+    void broadcastUserListUpdateToAllFriends(vector<string> friends);
 private:
     string username;
-    bool isFree;
-    User *nowChatingWith;
     int socket;
     pthread_t threadId;
 };
