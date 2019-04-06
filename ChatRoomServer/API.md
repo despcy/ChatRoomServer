@@ -96,7 +96,7 @@ RESPONSE: ~~[Online Friend User List Update](#online-friend-user-list-update)~~
 |NOLN|friend offline|
 # Server To Client:
 
-## HeartBeat
+## ~~HeartBeat~~
 
 To keep alive, **Server will send client** the following Code every 30 seconds, if no response, the client will be set offline and socket will close
 
